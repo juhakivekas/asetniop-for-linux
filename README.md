@@ -11,11 +11,17 @@ Any contributions, issues, and discussion is welcome! Raise issues or shoot me a
 Building
 --------
 
-At the moment [libevdev](https://www.freedesktop.org/wiki/Software/libevdev/) needs to be compiled in the root of the repo.
-Clone it, build it, and make changes to the Makefile if needed.
+
+Install [libevdev](https://www.freedesktop.org/wiki/Software/libevdev/) development files.
+
+	apt-get install libevdev-dev
+
 After this compiling the asetniop userland hijacker should be as easy as this:
 
 	make asetniop
+
+There are probably some packages that are needed to have all the building tools.
+I'll add these whenever I make a test on a clean installation of debian.
 
 Running
 -------

@@ -1,3 +1,4 @@
+//some of these are probably not necessary!
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,8 +10,8 @@
 #include <assert.h>
 #include <linux/input.h>
 
-#include "libevdev/libevdev.h"
-#include "libevdev/libevdev-uinput.h"
+#include <libevdev/libevdev.h>
+#include <libevdev/libevdev-uinput.h>
 
 static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev)
 {
