@@ -1,0 +1,8 @@
+digraph G{
+	node [fontname=sans]
+	edge [fontname=sans]
+
+	event0 -> "X server"
+	event1 -> "X server"
+	event2 -> "X server"
+}

@@ -1,0 +1,14 @@
+digraph H{
+	node [fontname=sans]
+	edge [fontname=sans]
+
+	event1 -> "X server"
+	event2 -> "X server"
+	event0 -> "X server" [style=dotted; label="normal event flow"]
+
+	event0 -> hijacker
+	hijacker -> "state machine" [label="ASETNIOP keys"]
+	hijacker -> uinput [label="all other keys"]
+	"state machine" -> uinput [label="processed input"]
+	uinput  -> "X server"	
+}
