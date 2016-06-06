@@ -133,4 +133,13 @@ While ambitious and eager users might slowly move towards a pure asetniop typing
 
 In general passing non-home-row keys through the driver gives more flexibility to the users, eases adaptation and doesn't interfere with regular use of the desktop keyboard.
 
+I'm wiriting C
+--------------
 
+The bigger borther C++ has a lot of nice added functionality, sometimes a bit too much.
+Since I'm working with the kernel and input devices I decided that C is the best language to use.
+It compiles even to the most low end devices, which is good in case someone wants to use this implementation of the ASETNIOP state machine for something different, like a hardware device.
+Preferably I'll be separating functionalities enough to make the code _actually_ reusable.
+This includes compiling as C99 and excludes the use of malloc(3).
+
+This might not be the case for all the code in this project, but at least those parts that work purely with the ASETNIOP logic.
