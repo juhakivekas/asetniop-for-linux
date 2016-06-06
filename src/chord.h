@@ -6,6 +6,9 @@
  * well as their diration.
  */
 
+#ifndef chord_h
+#define chord_h
+
 enum touch{
 	TOUCH_A = 0,
 	TOUCH_S,
@@ -16,53 +19,54 @@ enum touch{
 	TOUCH_O,
 	TOUCH_P,
 	TOUCH_SHIFT,
-	TOUCH_SPACE
+	TOUCH_SPACE,
+	NUM_TOUCHES //this is just to avoid hardcoding 10 everywhere
 };
 
-struct asetniop{
+typedef struct chord{
 	/// The state of all the touches
 	int touch_state[10];
 
 	/// The accumulated touches since last zeroing.
 	int touch_accumulator[10];
-}
+}chord;
 
 /// Singal that a touch was started.
 /* Tells the state that a signal representing the start of a touch
  * occured. This could be a physical sensor, an event signal, or a touch
  * on a screen.
  */ 
-void asetniop_touch_start(struct *asetniop, enum touch);
+void chord_touch_start(struct chord*, enum touch);
 
 /// Singal that a touch action ended.
 /* Tells the state that a signal representing the end of a touch
  * occured.
  */
-void asetniop_touch_end(struct *asetniop, enum touch);
+void chord_touch_end(struct chord*, enum touch);
 
 /// Checks if any touch is ongoing.
 /* If no touch gestures are ongoing, this will return true. This would
  * be the state we are in when the user is not interacting with the
  * device.
  */
-void asetniop_touch_is_empty(struct *asetniop);
+void chord_touch_is_empty(struct chord*);
 
 /// Sets all touch states and accumulator to not touching.
-/* Used to initialize the asetniop struct or to re-initialize the touch
+/* Used to initialize the chord struct or to re-initialize the touch
  * accumulator between chords.
  */
-void asetniop_touch_reset(struct *asetniop);
+void chord_touch_reset(struct chord*);
 
 /// Get the keycode that the current accumulated chord corresponds to.
 /* Gets an EV_KEY code that corresponds to the chord accumulated since
  * the last call to touch_empty.
  */
-int asetniop_get_keycode(struct *asetniop);
+int chord_get_keycode(struct chord*);
 
 /// Get a bitmap of the state.
-static int state_as_int(struct *asetniop);
+static int state_as_int(struct chord*);
 
 /// Get a bitmap of the accumulator.
-static int state_as_int(struct *asetniop);
+static int state_as_int(struct chord*);
 
-
+#endif/*chord_h*/
