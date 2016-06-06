@@ -31,6 +31,12 @@ typedef struct chord{
 	int touch_accumulator[10];
 }chord;
 
+/// Sets all touch states and accumulator to not touching.
+/* Used to initialize the chord struct or to re-initialize the touch
+ * accumulator between chords.
+ */
+void chord_reset(struct chord*);
+
 /// Singal that a touch was started.
 /* Tells the state that a signal representing the start of a touch
  * occured. This could be a physical sensor, an event signal, or a touch
@@ -49,24 +55,12 @@ void chord_touch_end(struct chord*, enum touch);
  * be the state we are in when the user is not interacting with the
  * device.
  */
-void chord_touch_is_empty(struct chord*);
+int chord_state_is_empty(struct chord*);
 
-/// Sets all touch states and accumulator to not touching.
-/* Used to initialize the chord struct or to re-initialize the touch
- * accumulator between chords.
- */
-void chord_touch_reset(struct chord*);
+/// Get the bitmap that the currently touched chord corresponds to.
+int chord_state_bitmap(struct chord*);
 
-/// Get the keycode that the current accumulated chord corresponds to.
-/* Gets an EV_KEY code that corresponds to the chord accumulated since
- * the last call to touch_empty.
- */
-int chord_get_keycode(struct chord*);
-
-/// Get a bitmap of the state.
-static int state_as_int(struct chord*);
-
-/// Get a bitmap of the accumulator.
-static int state_as_int(struct chord*);
+/// Get the keycode that the currently accumulated chord corresponds to.
+int chord_accumulator_bitmap(struct chord*);
 
 #endif/*chord_h*/

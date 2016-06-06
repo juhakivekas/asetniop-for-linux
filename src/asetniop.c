@@ -13,25 +13,38 @@
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 
-static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev)
+#include "chord.h"
+
+static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev, struct chord* state)
 {
 	int err;
 
+	enum touch t = NUM_TOUCHES;
 	switch(ev->code){
-	case KEY_A:         ev->code = KEY_A; break;
-	case KEY_S:         ev->code = KEY_S; break;
-	case KEY_D:         ev->code = KEY_E; break;
-	case KEY_F:         ev->code = KEY_T; break;
-	case KEY_J:         ev->code = KEY_N; break;
-	case KEY_K:         ev->code = KEY_I; break;
-	case KEY_L:         ev->code = KEY_O; break;
-	case KEY_SEMICOLON: ev->code = KEY_P; break;
+	case KEY_A:         t = TOUCH_A; break;
+	case KEY_S:       	t = TOUCH_S; break;
+	case KEY_D:         t = TOUCH_E; break;
+	case KEY_F:         t = TOUCH_T; break;
+	case KEY_J:         t = TOUCH_N; break;
+	case KEY_K:         t = TOUCH_I; break;
+	case KEY_L:         t = TOUCH_O; break;
+	case KEY_SEMICOLON: t = TOUCH_P; break;
 	}
-	
-	printf("%s, %s, %d\n",
-		libevdev_event_type_get_name(ev->type),
-		libevdev_event_code_get_name(ev->type, ev->code),
-		ev->value);
+	if(t < NUM_TOUCHES){
+		fprintf(stderr, "current chord: 0x%x\n", chord_state_bitmap(state));
+		switch(ev->value){
+		case 1: chord_touch_start(state, t); break;
+		case 0: chord_touch_end(state, t);   break;
+		}
+		if(chord_state_is_empty(state)){
+			fprintf(stderr, "Typed chord: 0x%x\n", chord_accumulator_bitmap(state));
+			chord_reset(state);
+		}
+	}
+//	printf("%s, %s, %d\n",
+//		libevdev_event_type_get_name(ev->type),
+//		libevdev_event_code_get_name(ev->type, ev->code),
+//		ev->value);
 
 	err = libevdev_uinput_write_event(uidev, EV_KEY, ev->code  , ev->value);
 	if (err < 0) {perror("Failed to write event"); return -1;}
@@ -44,6 +57,8 @@ int intercept(
 		struct libevdev_uinput *uidev,
 		struct libevdev *dev){
 	int err;
+	struct chord state;
+	chord_reset(&state);
 	do {
 		struct input_event ev;
 		err = libevdev_next_event(dev, LIBEVDEV_READ_FLAG_NORMAL|LIBEVDEV_READ_FLAG_BLOCKING, &ev);
@@ -55,15 +70,14 @@ int intercept(
 			}
 		} else if (err == LIBEVDEV_READ_STATUS_SUCCESS){
 			if(ev.type == EV_KEY && ev.code == KEY_ESC) return 0; //kill the interceptor with the escape key!
-			if(ev.type == EV_KEY) forward_event(uidev, &ev);
+			if(ev.type == EV_KEY && ev.value != 2) forward_event(uidev, &ev, &state);
 		}
 	} while (err == LIBEVDEV_READ_STATUS_SYNC || err == LIBEVDEV_READ_STATUS_SUCCESS || err == -EAGAIN);
 
 	if (err != LIBEVDEV_READ_STATUS_SUCCESS && err != -EAGAIN)
 		fprintf(stderr, "Failed to handle events: %s\n", strerror(-err));
 
-	return 0;
-}
+	return 0;}
 
 int main(int argc, char **argv)
 {
