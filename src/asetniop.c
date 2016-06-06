@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -14,10 +15,6 @@
 static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev)
 {
 	int err;
-	printf("alter (%s, %s, %d)",
-		libevdev_event_type_get_name(ev->type),
-		libevdev_event_code_get_name(ev->type, ev->code),
-		ev->value);
 
 	switch(ev->code){
 	case KEY_A:         ev->code = KEY_A; break;
@@ -30,7 +27,7 @@ static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev)
 	case KEY_SEMICOLON: ev->code = KEY_P; break;
 	}
 	
-	printf(" to (%s, %s, %d)\n",
+	printf("%s, %s, %d\n",
 		libevdev_event_type_get_name(ev->type),
 		libevdev_event_code_get_name(ev->type, ev->code),
 		ev->value);
@@ -42,70 +39,68 @@ static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev)
 	return 0;
 }
 
-int main(int argc, char **argv)
-{
-	struct libevdev *dev = NULL;
-	const char *file;
-	int fd;
-	int err = 1;
-
-	if (argc < 2){
-		fprintf(stderr, "Usage: %s <event device>\n", argv[0]);
-		return 1;
-	}
-
-	//-------- open the keyboard device
-	file = argv[1];
-	fd = open(file, O_RDONLY);
-	if (fd < 0) {perror("Failed to open device");goto out;}
-
-	err = libevdev_new_from_fd(fd, &dev);
-	if (err < 0) {perror("Failed to create libevdev device"); goto out;}
-	err = libevdev_grab(dev, LIBEVDEV_GRAB);
-	printf("Input device ID: bus %#x vendor %#x product %#x\n",
-			libevdev_get_id_bustype(dev),
-			libevdev_get_id_vendor(dev),
-			libevdev_get_id_product(dev));
-	printf("Evdev version: %x\n", libevdev_get_driver_version(dev));
-	printf("Input device name: \"%s\"\n", libevdev_get_name(dev));
-	printf("Phys location: %s\n", libevdev_get_phys(dev));
-	printf("Uniq identifier: %s\n", libevdev_get_uniq(dev));
-
-	//------- create a uinput device based on the openend device
-	struct libevdev_uinput *uidev;
-	
-	err = libevdev_uinput_create_from_device(
-		dev,
-		LIBEVDEV_UINPUT_OPEN_MANAGED,
-		&uidev);
-
-	if (err < 0) {perror("Failed to create uinput device"); goto out;}
-
-	
+int intercept(
+		struct libevdev_uinput *uidev,
+		struct libevdev *dev){
+	int err;
 	do {
 		struct input_event ev;
 		err = libevdev_next_event(dev, LIBEVDEV_READ_FLAG_NORMAL|LIBEVDEV_READ_FLAG_BLOCKING, &ev);
 		if (err == LIBEVDEV_READ_STATUS_SYNC) {
-			//the status was dropped, re-sync
+		//the status was dropped, re-sync
 			printf("dropped, syncing status\n");
 			while (err == LIBEVDEV_READ_STATUS_SYNC) {
 				err = libevdev_next_event(dev, LIBEVDEV_READ_FLAG_SYNC, &ev);
 			}
-		} else if (err == LIBEVDEV_READ_STATUS_SUCCESS)
-			if(ev.type == EV_KEY && ev.code == KEY_ESC){
-				//quit the program in a nice way
-				err = libevdev_grab(dev, LIBEVDEV_UNGRAB);
-				exit(0);
-			}
+		} else if (err == LIBEVDEV_READ_STATUS_SUCCESS){
+			if(ev.type == EV_KEY && ev.code == KEY_ESC) return 0; //kill the interceptor with the escape key!
 			if(ev.type == EV_KEY) forward_event(uidev, &ev);
+		}
 	} while (err == LIBEVDEV_READ_STATUS_SYNC || err == LIBEVDEV_READ_STATUS_SUCCESS || err == -EAGAIN);
 
 	if (err != LIBEVDEV_READ_STATUS_SUCCESS && err != -EAGAIN)
 		fprintf(stderr, "Failed to handle events: %s\n", strerror(-err));
 
-	err = 0;
-	out:
-	libevdev_free(dev);
+	return 0;
+}
 
+int main(int argc, char **argv)
+{
+	struct libevdev *dev = NULL;
+	struct libevdev_uinput *uidev = NULL;
+	int fd, err;
+
+	if (argc < 2){
+		fprintf(stderr, "Usage: %s <event device>\n", argv[0]);
+		return 1;
+	}
+	
+	//open the event device file descriptor
+	fd = open(argv[1], O_RDONLY);
+	if (fd < 0) {perror("Failed to open device"); return fd;}
+
+	//create a libevdev device from the event file descriptor
+	err = libevdev_new_from_fd(fd, &dev);
+	if (err < 0) {perror("Failed to create libevdev device"); return err;}
+
+	//create a device connected to the virtual device interface /dev/uinput
+	err = libevdev_uinput_create_from_device(
+		dev,
+		LIBEVDEV_UINPUT_OPEN_MANAGED,
+		&uidev);
+	if (err < 0) {perror("Failed to create uinput device"); return err;}
+
+	sleep(1);
+	//EVIOCGRAB the event, this means no other client will receive the events from the device, including your window manager.
+	// "This is generally a bad idea. Don't do this." - libevdev documentation
+	//We need to do this to avoid douplicate keyboard events.
+	err = libevdev_grab(dev, LIBEVDEV_GRAB);
+
+	//start the interceptor and never return
+	intercept(uidev, dev);
+
+	libevdev_uinput_destroy(uidev);
+	libevdev_grab(dev, LIBEVDEV_UNGRAB);
+	libevdev_free(dev);
 	return err;
 }
