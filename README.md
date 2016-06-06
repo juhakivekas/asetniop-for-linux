@@ -5,12 +5,13 @@ Asetniop for Linux
 I don't own a tablet, but I like the idea quite a lot even on a keyboard.
 This is an implementation-in-the-making to bring the asetniop keyboard to Linux on a system-wide level.
 
+For info on the workflow, architecture, design choises, etc. check out the files in `doc/`.
 Any contributions, issues, and discussion is welcome! Raise issues or shoot me a mail.
 
 Building
 --------
 
-At the moment [libevdev](git://anongit.freedesktop.org/libevdev) needs to be compiled in the root of the repo.
+At the moment [libevdev](https://www.freedesktop.org/wiki/Software/libevdev/) needs to be compiled in the root of the repo.
 Clone it, build it, and make changes to the Makefile if needed.
 After this compiling the asetniop userland hijacker should be as easy as this:
 
