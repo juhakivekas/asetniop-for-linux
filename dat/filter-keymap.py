@@ -6,6 +6,8 @@
 
 import json
 
+#these are not magic numbers, they come from <linux/input.h>
+#check grabcodes.sh for details
 keycode = {
 	"q": 16,
 	"w": 17,
@@ -43,17 +45,31 @@ keymap = [mapping[1] for mapping in sorted(list(keymap.items()), key=lambda k: i
 
 table = [0]* 256
 #filter and write a keymap
+
+
+print('chord',end='\t')
+print('UTF-8', end='\t')
+print('keycode',  end='\t')
+print('chord touches')
+print('-----------------------------------')
+
 for mapping in keymap[1:]:
 	chord = sum([1<<(i-1) for i in mapping['input']])
 	if list(mapping.keys()).count('base') != 0:
 		if len(mapping['base']) == 1 and mapping['base'].islower():
+			print(hex(chord),end='\t')
 			print(mapping['base'], end='\t')
-			print(mapping['input'], end='\t')
-			print(chord)
+			print(keycode[mapping['base']],  end='\t')
+			print(mapping['input'])
 			table[chord] = keycode[mapping['base']]
+		elif len(mapping['base']) == 1:
+			print(hex(chord),end='\t')
+			print(mapping['base'], end='\t')
+			print('null',  end='\t')
+			print(mapping['input'])
+			
 
 minimal = open('test-keymap-minimal.dat', 'w')
 #minimal.write('\x00')
 for char in table:
 	minimal.write(chr(char))
-
