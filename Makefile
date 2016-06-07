@@ -17,11 +17,10 @@ src/%.o:src/%.c
 #======== TESTS ==============
 
 libcunit_flags=-lcunit
-test_sources=$(wildcard test/*.c)
-test_executables=$(patsubst test/%.c, test/%, $(test_sources))
 
-test:test/chord_test
+test:test/chord_test test/lookup_test  
 	test/chord_test
+	test/lookup_test
 
 test/%_test:test/%_test.c src/%.c
 	$(CC) $(CFLAGS) $^ -o $@ $(libcunit_flags)

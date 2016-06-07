@@ -14,6 +14,7 @@
 #include <libevdev/libevdev-uinput.h>
 
 #include "chord.h"
+#include "lookup.h"
 
 static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev, struct chord* state)
 {
@@ -31,25 +32,27 @@ static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev, 
 	case KEY_SEMICOLON: t = TOUCH_P; break;
 	}
 	if(t < NUM_TOUCHES){
-		fprintf(stderr, "current chord: 0x%x\n", chord_state_bitmap(state));
+		//fprintf(stderr, "current chord: 0x%02x\n", chord_state_bitmap(state));
 		switch(ev->value){
 		case 1: chord_touch_start(state, t); break;
 		case 0: chord_touch_end(state, t);   break;
 		}
 		if(chord_state_is_empty(state)){
-			fprintf(stderr, "Typed chord: 0x%x\n", chord_accumulator_bitmap(state));
+			lookup_key k = chord_accumulator_bitmap(state);
+			fprintf(stderr, "Typed chord: 0x%02x %c\n", k, lookup_keycode(k));
 			chord_reset(state);
 		}
-	}
+	} else {
 //	printf("%s, %s, %d\n",
 //		libevdev_event_type_get_name(ev->type),
 //		libevdev_event_code_get_name(ev->type, ev->code),
 //		ev->value);
 
-	err = libevdev_uinput_write_event(uidev, EV_KEY, ev->code  , ev->value);
-	if (err < 0) {perror("Failed to write event"); return -1;}
-	err = libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
-	if (err < 0) {perror("Failed to write event"); return -1;}
+		err = libevdev_uinput_write_event(uidev, EV_KEY, ev->code  , ev->value);
+		if (err < 0) {perror("Failed to write event"); return -1;}
+		err = libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
+		if (err < 0) {perror("Failed to write event"); return -1;}
+	}
 	return 0;
 }
 
@@ -57,8 +60,10 @@ int intercept(
 		struct libevdev_uinput *uidev,
 		struct libevdev *dev){
 	int err;
+	//initialize some objects
 	struct chord state;
 	chord_reset(&state);
+	lookup_init("dat/test-keymap-minimal.dat");
 	do {
 		struct input_event ev;
 		err = libevdev_next_event(dev, LIBEVDEV_READ_FLAG_NORMAL|LIBEVDEV_READ_FLAG_BLOCKING, &ev);

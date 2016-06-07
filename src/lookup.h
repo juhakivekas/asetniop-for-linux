@@ -6,18 +6,23 @@
  * and prediction will belong elsewhere.
  */ 
 
-/// A chord is a bitmask of touch signals.
-typedef int chord;
+#ifndef lookup_h
+#define lookup_h
+
+/// A chord is looked up with a bitmask of touch signals.
+typedef int lookup_key;
 
 /// Initialize the lookup structure.
 /* The initialisation is done from a file to discourage hardcoding. The
  * format will probably change drastically over time.
  */
-void init_lookup(char* filename);
+int lookup_init(char* filename);
 
 /// Get the keycode corresponding to a certain chord.
-/* Whatever the chord type is, it will always correspond to a character,
- * key, or set of characters. This is also an interface that will change
- * over time.
+/* Whatever the chord/lookup_key type is, it will always correspond to a
+ * character, key, or set of characters. This is also an interface that
+ * will change over time.
  */
-int get_keycode(chord);
+char lookup_keycode(lookup_key);
+
+#endif/*lookup_h*/
