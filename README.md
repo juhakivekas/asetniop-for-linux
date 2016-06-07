@@ -10,7 +10,6 @@ Currently the program steals the keyboard from all clients (including the X serv
 By default all keystrokes are passed throught the filter unmodified.
 The `a`, `s`, `d`, `f`, `j`, `k`, `l`, and `;` keys (in a US layout) are not passed through but are instead aggregated into chords that make up the ASETNIOP typing system.
 This means that you can use ASETNIOP and still have most of the keyboard unaltered.
-In addition to all this, the `ESC` key will quit the program, just in case something stops working.
 
 For info on the workflow, architecture, design choices, etc. check out the files in `doc`.
 Any contributions, issues, and discussion is welcome! Raise guthyb issues or shoot me a mail.

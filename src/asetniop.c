@@ -74,9 +74,6 @@ int intercept(struct libevdev_uinput *uidev, struct libevdev *dev){
 	do {
 		ret = libevdev_next_event(dev, LIBEVDEV_READ_FLAG_NORMAL|LIBEVDEV_READ_FLAG_BLOCKING, &ev);
 		if (ret == LIBEVDEV_READ_STATUS_SUCCESS){
-			//kill the interceptor with the escape key!
-			if(ev.type == EV_KEY && ev.code == KEY_ESC)
-				return 0;
 			//forward key down and key up events
 			if(ev.type == EV_KEY && (ev.value == 1 || ev.value == 0))
 				forward_event(uidev, &ev, &state);

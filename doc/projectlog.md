@@ -180,4 +180,14 @@ This is also true if we just want the software to be used by as large an audienc
 In the case of ASETNIOP for Linux, this means we should be able to run on any distribution, not just eg. on Debian and Ubuntu,
 In the broader case this means that the objects and architecture should be implemented in such a way that they can be ported to another operating system or hardware platform.
 
+First impressions
+-----------------
+
+I now have a working ASETNIOP keyboard, and I'm writing this text with it.
+First off I have to say that my typing is very slow, like a snail.
+Secondly, the keyboard feels very heavy all of a sudden.
+The comfortably familiar keyboard I have has never felt so thick and clumsy.
+I can imagine that this would feel a lot more natural on a touch screen where I could tap the chords with feather light touches.
+
+I like learning, and that is not any different with this.
 
