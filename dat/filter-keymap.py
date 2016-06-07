@@ -6,26 +6,54 @@
 
 import json
 
+keycode = {
+	"q": 16,
+	"w": 17,
+	"e": 18,
+	"r": 19,
+	"t": 20,
+	"y": 21,
+	"u": 22,
+	"i": 23,
+	"o": 24,
+	"p": 25,
+	"a": 30,
+	"s": 31,
+	"d": 32,
+	"f": 33,
+	"g": 34,
+	"h": 35,
+	"j": 36,
+	"k": 37,
+	"l": 38,
+	"z": 44,
+	"x": 45,
+	"c": 46,
+	"v": 47,
+	"b": 48,
+	"n": 49,
+	"m": 50,
+}
+
 #load the json file in its entirety
 keymap = json.loads(open('test-keymap.json', 'r').read(-1))
 
 #flatten the dict into an array
 keymap = [mapping[1] for mapping in sorted(list(keymap.items()), key=lambda k: int(k[0]))]
 
-table = ['\x00']* 256
+table = [0]* 256
 #filter and write a keymap
 for mapping in keymap[1:]:
-	code = sum([1<<(i-1) for i in mapping['input']])
+	chord = sum([1<<(i-1) for i in mapping['input']])
 	if list(mapping.keys()).count('base') != 0:
-		if len(mapping['base']) == 1:
+		if len(mapping['base']) == 1 and mapping['base'].islower():
 			print(mapping['base'], end='\t')
 			print(mapping['input'], end='\t')
-			print(code)
-			table[code] = mapping['base']
-	else:
-		table[code] = '\x00'
+			print(chord)
+			table[chord] = keycode[mapping['base']]
 
 minimal = open('test-keymap-minimal.dat', 'w')
 #minimal.write('\x00')
 for char in table:
-	minimal.write(char)
+	minimal.write(chr(char))
+

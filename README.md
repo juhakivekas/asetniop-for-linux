@@ -1,9 +1,9 @@
-Asetniop for Linux
+ASETNIOP for Linux
 ------------------
 
-[Asetniop](http://asetniop.com/) is an alternative input method targeted for devices with touchscreen interfaces.
+[ASETNIOP](http://asetniop.com/) is an alternative input method targeted for devices with touchscreen interfaces.
 I don't own a tablet, but I like the idea quite a lot even on a keyboard.
-This is an implementation-in-the-making to bring the asetniop keyboard to Linux on a system-wide level.
+This is an implementation-in-the-making to bring the ASETNIOP keyboard to Linux on a system-wide level.
 
 For info on the workflow, architecture, design choises, etc. check out the files in `doc/`.
 Any contributions, issues, and discussion is welcome! Raise issues or shoot me a mail.

@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <string.h>
 #include "CUnit/Basic.h"
+
 #include "../src/lookup.h"
+#include <linux/input.h> //for key codes!
 
 int init_suite1(void){
 	  return 0;
@@ -21,10 +21,10 @@ void test_lookup_init(){
 	CU_ASSERT(0 == err);
 
 	CU_ASSERT(0 == lookup_keycode(0));
-	CU_ASSERT('h' == lookup_keycode(0x30));
-	CU_ASSERT('e' == lookup_keycode(0x04));
-	CU_ASSERT('l' == lookup_keycode(0x60));
-	CU_ASSERT('o' == lookup_keycode(0x40));
+	CU_ASSERT(KEY_H == lookup_keycode(0x30));
+	CU_ASSERT(KEY_E == lookup_keycode(0x04));
+	CU_ASSERT(KEY_L == lookup_keycode(0x60));
+	CU_ASSERT(KEY_O == lookup_keycode(0x40));
 }
 
 

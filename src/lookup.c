@@ -1,6 +1,9 @@
 #include "lookup.h"
 #include <stdio.h>
 
+#include <linux/input.h>
+
+
 char table[256];
 
 int lookup_init(char* filename){

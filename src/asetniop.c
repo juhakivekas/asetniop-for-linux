@@ -39,7 +39,16 @@ static int forward_event(struct libevdev_uinput *uidev, struct input_event *ev, 
 		}
 		if(chord_state_is_empty(state)){
 			lookup_key k = chord_accumulator_bitmap(state);
-			fprintf(stderr, "Typed chord: 0x%02x %c\n", k, lookup_keycode(k));
+			int keycode = lookup_keycode(k);
+			if(keycode != KEY_RESERVED){
+				fprintf(stderr, "chord 0x%02x %s\n", k, libevdev_event_code_get_name(EV_KEY, keycode));
+				err = libevdev_uinput_write_event(uidev, EV_KEY, keycode   , 1);
+				if (err < 0) {perror("Failed to write event"); return -1;}
+				err = libevdev_uinput_write_event(uidev, EV_KEY, keycode   , 0);
+				if (err < 0) {perror("Failed to write event"); return -1;}
+				err = libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
+				if (err < 0) {perror("Failed to write event"); return -1;}
+			}
 			chord_reset(state);
 		}
 	} else {
