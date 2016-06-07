@@ -3,14 +3,20 @@ ASETNIOP for Linux
 
 [ASETNIOP](http://asetniop.com/) is an alternative input method targeted for devices with touchscreen interfaces.
 I don't own a tablet, but I like the idea quite a lot even on a keyboard.
-This is an implementation-in-the-making to bring the ASETNIOP keyboard to Linux on a system-wide level.
+This is a basic implementation of the ASETNIOP keyboard to Linux on a system-wide level.
+Only the english language letters are supported at this point.
 
-For info on the workflow, architecture, design choises, etc. check out the files in `doc/`.
-Any contributions, issues, and discussion is welcome! Raise issues or shoot me a mail.
+Currently the program steals the keyboard from all clients (including the X server) and filters the kystrokes you make.
+By default all keystrokes are passed throught the filter unmodified.
+The `a`, `s`, `d`, `f`, `j`, `k`, `l`, and `;` keys (in a US layout) are not passed through but are instead aggregated into chords that make up the ASETNIOP typing system.
+This means that you can use ASETNIOP and still have most of the keyboard unaltered.
+In addition to all this, the `ESC` key will quit the program, just in case something stops working.
+
+For info on the workflow, architecture, design choices, etc. check out the files in `doc`.
+Any contributions, issues, and discussion is welcome! Raise guthyb issues or shoot me a mail.
 
 Building
 --------
-
 
 Install [libevdev](https://www.freedesktop.org/wiki/Software/libevdev/) development files.
 
@@ -44,8 +50,8 @@ Debugging
 Obviously debugging something that is altering your keystrokes will be risky and might force you to reboot.
 No damage will be permanent, but since we are stealing some resources from the system it is a good idea to have a plan for when your keyboard stops working.
 
-What I do is i run my gdb in a separate terminal so that I can kill it with my mouse by closing the window.
-That kills the program and returns the keyboard back to the system.
+What I do is i asetniop in a separate terminal so that I can kill it with my mouse by closing the window.
+Killing the program and returns the keyboard back to the system.
 Another way to do this would be to have two separete keyboards, the other one for testing, the other one for actual usage.
 The main point here is that you should have a way to kill the intercepting process when your keyboard vanishes.
 
