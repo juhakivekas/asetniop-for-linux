@@ -9,10 +9,10 @@ Only the english language letters are supported at this point.
 Currently the program steals the keyboard from all clients (including the X server) and filters the kystrokes you make.
 By default all keystrokes are passed throught the filter unmodified.
 The `a`, `s`, `d`, `f`, `j`, `k`, `l`, and `;` keys (in a US layout) are not passed through but are instead aggregated into chords that make up the ASETNIOP typing system.
-This means that you can use ASETNIOP and still have most of the keyboard unaltered.
+This means that you can use ASETNIOP and still have most of the keyboard unaltered, such as `ctrl-c` to kill the program.
 
 For info on the workflow, architecture, design choices, etc. check out the files in `doc`.
-Any contributions, issues, and discussion is welcome! Raise guthyb issues or shoot me a mail.
+Any contributions, issues, and discussion is welcome! Raise github issues or shoot me a mail on guth.smash@gmail.com.
 
 Building
 --------
@@ -51,6 +51,6 @@ No damage will be permanent, but since we are stealing some resources from the s
 
 What I do is i asetniop in a separate terminal so that I can kill it with my mouse by closing the window.
 Killing the program and returns the keyboard back to the system.
-Another way to do this would be to have two separete keyboards, the other one for testing, the other one for actual usage.
+Another way to do this would be to have two separate keyboards, the other one for testing, the other one for actual usage.
 The main point here is that you should have a way to kill the intercepting process when your keyboard vanishes.
 
